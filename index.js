@@ -12,7 +12,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
-  res.end("Welcome to Siloka Backend");
+  res.send("Welcome to Siloka Backend");
+});
+
+app.get("/to-cs", (req, res) => {
+  res.send("Directing to customer service...");
 });
 
 app.post("/message", (req, res) => {
