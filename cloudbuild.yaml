@@ -1,0 +1,22 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/siloka-backend", "."]
+
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      [
+        "compute",
+        "instance-groups",
+        "managed",
+        "rolling-action",
+        "replace",
+        "instance-group-backend",
+        "--max-surge=1",
+        "--zone=asia-southeast1-b",
+      ]
+
+images:
+  - gcr.io/$PROJECT_ID/siloka-backend
+logsBucket: "gs://siloka-build-logg"
+options:
+  logging: GCS_ONLY
