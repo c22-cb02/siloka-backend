@@ -1,6 +1,12 @@
 import express from "express";
 import cors from "cors";
 import axios from "axios";
+import { Generator } from "snowflake-generator";
+
+// Make custom toJSON implementation of BigInt because Snowflake return BigInt
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 
 const app = express();
 const port = process.env.NODE_ENV === "production" ? 80 : 3000;
@@ -16,6 +22,15 @@ app.get("/", (req, res) => {
 
 app.get("/to-cs", (req, res) => {
   res.json({ message: "Directing to customer service..." });
+});
+
+app.get("/generate-roomid", (req, res) => {
+  const timestamp = 988131601;
+
+  const SnowflakeGenerator = new Generator(timestamp);
+  const generatedSnowflakeId = SnowflakeGenerator.generate();
+
+  res.json({ room_id: generatedSnowflakeId });
 });
 
 app.post("/message", async (req, res) => {
