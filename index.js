@@ -1,42 +1,37 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-var http = require("http");
+import express from "express";
+import cors from "cors";
+import axios from "axios";
 
 const app = express();
-const port = process.env.NODE_ENV === 'production' ? 80 : 3000;
-
-app.use(cors());
+const port = process.env.NODE_ENV === "production" ? 80 : 3000;
 
 // Configuring body parser middleware
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
-  res.end("Welcome to Siloka Backend");
+  res.json({ message: "Welcome to Siloka Backend" });
 });
 
 app.get("/to-cs", (req, res) => {
-  res.end("Directing to customer service...");
+  res.json({ message: "Directing to customer service..." });
 });
 
-app.post("/message", (req, res) => {
-  var payload = { messages: req.body };
-  var request = http.request(
-    {
-      host: "34.87.1.81",
-      port: 80,
-      path: "/predict/",
-      method: "POST",
-      body: JSON.stringify(payload),
-    },
-    function (response) {
-      response.on("data", function (chunk) {
-        res.send(chunk);
-      });
-    }
-  );
-  request.end();
+app.post("/message", async (req, res) => {
+  const payload = {
+    messages: req.body.content,
+  };
+
+  const response = await axios
+    .post("http://34.87.1.81/predict/", payload)
+    .catch((error) =>
+      res.status(500).json({ message: "There is problem with the API" })
+    );
+
+  const predictionData = response.data;
+
+  res.json({ message: predictionData.predicted_response });
 });
 
 app.post("/message-shortcut", (req, res) => {
