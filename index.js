@@ -4,7 +4,7 @@ const cors = require("cors");
 var http = require("http");
 
 const app = express();
-const port = 3000;
+const port = process.env.NODE_ENV === 'production' ? 80 : 3000;
 
 app.use(cors());
 
