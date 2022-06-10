@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import axios from "axios";
-import { addMessage, addSuccessRate, addToCS } from "./utils";
+import { addMessage, addSuccessRate, addToCS } from "./utils.js";
 
 const app = express();
 const port = process.env.NODE_ENV === "production" ? 80 : 3000;
@@ -32,7 +32,7 @@ app.post("/feedback", async (req, res) => {
 });
 
 app.get("/to-cs", async (req, res) => {
-  const room_id = req.body.room_id;
+  const room_id = req.query.room_id;
   await addToCS(room_id, true);
   res.json({ viewType: 0, message: "Directing to customer service..." });
 });
