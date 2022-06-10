@@ -40,13 +40,13 @@ app.post("/feedback", async (req, res) => {
     const is_answer_ok = payload.is_answer_ok;
     await addSuccessRate(room_id, is_answer_ok);
 
-    if (!payload.is_answer_ok) {
+    if (!is_answer_ok) {
       await addToCS(room_id, false);
-      res.json({ viewType: 4, message: null });
+      return res.json({ viewType: 4, message: null });
     }
-  } catch (error) {
-    console.error(error);
-    res.json({ error: error.message });
+    res.json({ message: `Thank you for the feedback. (${room_id})` });
+  } catch (err) {
+    res.json({ error: err.message });
   }
 });
 
@@ -58,21 +58,23 @@ app.get("/to-cs", async (req, res) => {
 
 app.post("/message", async (req, res) => {
   const payload = {
-    messages: req.body.message,
+    messages: req.body.query,
   };
 
   try {
-    const response = await axios.post("http://34.87.1.81/predict/", payload);
+    const response = await axios.post(
+      "http://35.240.219.237/predict/",
+      payload
+    );
 
     const room_id = req.body.room_id;
-    const messageFromUser = req.body.message;
+    const messageFromUser = req.body.query;
     await addMessage(room_id, messageFromUser);
 
     const predictionData = response.data;
     res.json({ viewType: 0, message: predictionData.predicted_response });
-  } catch (error) {
-    console.log(error);
-    res.json({ error: error.message });
+  } catch (err) {
+    res.json({ err: error.message });
   }
 });
 
