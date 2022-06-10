@@ -16,24 +16,43 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to Siloka Backend" });
 });
 
+app.post("/feedback", async (req, res) => {
+  const payload = {
+    room_id: req.body.room_id,
+    is_answer_ok: req.body.is_answer_ok,
+  };
+
+  if (!payload.is_answer_ok) {
+    res.json({ viewType: 4, message: null });
+  }
+});
+
 app.get("/to-cs", (req, res) => {
-  res.json({ message: "Directing to customer service..." });
+  const room_id = req.body.room_id;
+  const is_to_cs = true;
+  addToCS(room_id, is_to_cs);
+  res.json({ viewType : 0, message: "Directing to customer service..." });
 });
 
 app.post("/message", async (req, res) => {
   const payload = {
-    messages: req.body.content,
+    messages: req.body.message,
   };
 
   const response = await axios
     .post("http://34.87.1.81/predict/", payload)
     .catch((error) =>
-      res.status(500).json({ message: "There is problem with the API" })
+      res.status(500).json({ message: "There is a problem with the API" })
     );
 
   const predictionData = response.data;
 
-  res.json({ message: predictionData.predicted_response });
+  const room_id = req.body.room_id;
+  const messageFromUser = req.body.message;
+
+  addMessage(room_id, messageFromUser);
+
+  res.json({ viewType : 0, message: predictionData.predicted_response });
 });
 
 async function addToCS(room_id, choice) {
@@ -70,16 +89,6 @@ async function addSuccessRate(room_id, request, response, feedback) {
         value: room_id,
       },
       {
-        name: "request",
-        value: request,
-        excludeFromIndexes: true,
-      },
-      {
-        name: "response",
-        value: response,
-        excludeFromIndexes: true,
-      },
-      {
         name: "feedback",
         value: feedback,
       },
@@ -106,6 +115,7 @@ async function addMessage(room_id, message) {
       {
         name: "message",
         value: message,
+        excludeFromIndexes: true,
       },
     ],
   };
