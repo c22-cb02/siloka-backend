@@ -42,20 +42,19 @@ app.post("/message", async (req, res) => {
     messages: req.body.message,
   };
 
-  const response = await axios
-    .post("http://34.87.1.81/predict/", payload)
-    .catch((error) =>
-      res.status(500).json({ message: "There is a problem with the API" })
-    );
+  try {
+    const response = await axios.post("http://34.87.1.81/predict/", payload);
 
-  const predictionData = response.data;
+    const room_id = req.body.room_id;
+    const messageFromUser = req.body.message;
+    await addMessage(room_id, messageFromUser);
 
-  const room_id = req.body.room_id;
-  const messageFromUser = req.body.message;
-
-  await addMessage(room_id, messageFromUser);
-
-  res.json({ viewType: 0, message: predictionData.predicted_response });
+    const predictionData = response.data;
+    res.json({ viewType: 0, message: predictionData.predicted_response });
+  } catch (error) {
+    res.json({ error: error.message });
+    console.log(error);
+  }
 });
 
 app.listen(port, () => {
