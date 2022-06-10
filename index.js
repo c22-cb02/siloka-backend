@@ -52,8 +52,13 @@ app.post("/feedback", async (req, res) => {
 
 app.get("/to-cs", async (req, res) => {
   const room_id = req.query.room_id;
-  await addToCS(room_id, true);
-  res.json({ viewType: 0, message: "Directing to customer service..." });
+
+  try {
+    await addToCS(room_id, true);
+    res.json({ viewType: 0, message: "Directing to customer service..." });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
 });
 
 app.post("/message", async (req, res) => {
