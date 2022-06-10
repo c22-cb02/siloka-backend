@@ -2,6 +2,12 @@ import express from "express";
 import cors from "cors";
 import axios from "axios";
 import { addMessage, addSuccessRate, addToCS } from "./utils.js";
+import { Generator } from "snowflake-generator";
+
+// Make custom toJSON implementation of BigInt because Snowflake return BigInt
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 
 const app = express();
 const port = process.env.NODE_ENV === "production" ? 80 : 3000;
@@ -13,6 +19,15 @@ app.use(cors());
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to Siloka Backend" });
+});
+
+app.get("/generate-roomid", (req, res) => {
+  const timestamp = 988131601;
+
+  const SnowflakeGenerator = new Generator(timestamp);
+  const generatedSnowflakeId = SnowflakeGenerator.generate();
+
+  res.json({ room_id: generatedSnowflakeId });
 });
 
 app.post("/feedback", async (req, res) => {
