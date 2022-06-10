@@ -12,7 +12,6 @@ BigInt.prototype.toJSON = function () {
 const app = express();
 const port = process.env.NODE_ENV === "production" ? 80 : 3000;
 
-// Configuring body parser middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
@@ -36,13 +35,18 @@ app.post("/feedback", async (req, res) => {
     is_answer_ok: req.body.is_answer_ok,
   };
 
-  const room_id = payload.room_id;
-  const is_answer_ok = payload.is_answer_ok;
-  await addSuccessRate(room_id, is_answer_ok);
+  try {
+    const room_id = payload.room_id;
+    const is_answer_ok = payload.is_answer_ok;
+    await addSuccessRate(room_id, is_answer_ok);
 
-  if (!payload.is_answer_ok) {
-    await addToCS(room_id, false);
-    res.json({ viewType: 4, message: null });
+    if (!payload.is_answer_ok) {
+      await addToCS(room_id, false);
+      res.json({ viewType: 4, message: null });
+    }
+  } catch (error) {
+    console.error(error);
+    res.json({ error: error.message });
   }
 });
 
@@ -67,8 +71,8 @@ app.post("/message", async (req, res) => {
     const predictionData = response.data;
     res.json({ viewType: 0, message: predictionData.predicted_response });
   } catch (error) {
-    res.json({ error: error.message });
     console.log(error);
+    res.json({ error: error.message });
   }
 });
 
