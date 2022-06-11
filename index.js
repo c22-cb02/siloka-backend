@@ -3,8 +3,9 @@ import cors from "cors";
 import axios from "axios";
 import { addMessage, addSuccessRate, addToCS } from "./utils.js";
 import { Generator } from "snowflake-generator";
+import microbenchmark from "./microbenchmark.js"
 
-// Make custom toJSON implementation of BigInt because Snowflake return BigInt
+
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
@@ -20,16 +21,16 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to Siloka Backend" });
 });
 
-app.get("/generate-roomid", (req, res) => {
+app.get("/generate-roomid", microbenchmark(function generate_room_id(req, res) {
   const timestamp = 988131601;
 
   const SnowflakeGenerator = new Generator(timestamp);
   const generatedSnowflakeId = SnowflakeGenerator.generate();
 
   res.json({ room_id: generatedSnowflakeId });
-});
+}));
 
-app.post("/feedback", async (req, res) => {
+app.post("/feedback", microbenchmark(async function feedback(req, res) {
   const payload = {
     room_id: req.body.room_id,
     is_answer_ok: req.body.is_answer_ok,
@@ -48,9 +49,9 @@ app.post("/feedback", async (req, res) => {
   } catch (err) {
     res.json({ error: err.message });
   }
-});
+}));
 
-app.get("/to-cs", async (req, res) => {
+app.get("/to-cs", microbenchmark(async function cs_redirect(req, res) {
   const room_id = req.query.room_id;
 
   try {
@@ -59,9 +60,9 @@ app.get("/to-cs", async (req, res) => {
   } catch (err) {
     res.json({ error: err.message });
   }
-});
+}));
 
-app.post("/message", async (req, res) => {
+app.post("/message", microbenchmark(async function send_message(req, res) {
   const payload = {
     messages: req.body.query,
   };
@@ -81,7 +82,7 @@ app.post("/message", async (req, res) => {
   } catch (err) {
     res.json({ err: error.message });
   }
-});
+}));
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);

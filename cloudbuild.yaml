@@ -19,4 +19,4 @@ images:
   - gcr.io/$PROJECT_ID/siloka-backend
 logsBucket: "gs://siloka-build-logg"
 options:
-  logging: GCS_ONLY
+  logging: LEGACY
