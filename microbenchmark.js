@@ -2,7 +2,7 @@ import logger from "./logger.js"
 
 const getNS = (res) => res[0] * 1e9 + res[1];
 
-export default function test(name, wrapped) {
+export default function microbenchmark(wrapped) {
   return function decorator(...args) {
     const original = wrapped;
     if (typeof original === 'function') {
@@ -11,11 +11,10 @@ export default function test(name, wrapped) {
         const result = original.apply(this, args);
         const end = getNS(process.hrtime());
         const delta = end - start
-        logger.info(`Function ${name} ran in ${delta * 1000} nanoseconds`);
+        logger.info(`Function ${wrapped.name} ran in ${delta * 1000} nanoseconds`);
         return result;
       } catch (e) {
-        logger.error(`Error from function ${original.name} (${args}
-}): ${e}}`);
+        logger.error(`Error from function ${wrapped.name} with \n\n${args} \n\nas arguments. Errors: ${e}`);
         throw e;
       }
     }

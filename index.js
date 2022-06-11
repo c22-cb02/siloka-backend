@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to Siloka Backend" });
 });
 
-app.get("/generate-roomid", microbenchmark("generate-roomid", (req, res) => {
+app.get("/generate-roomid", microbenchmark(function generate_room_id(req, res) {
   const timestamp = 988131601;
 
   const SnowflakeGenerator = new Generator(timestamp);
@@ -30,7 +30,7 @@ app.get("/generate-roomid", microbenchmark("generate-roomid", (req, res) => {
   res.json({ room_id: generatedSnowflakeId });
 }));
 
-app.post("/feedback", microbenchmark("feedback", async (req, res) => {
+app.post("/feedback", microbenchmark(async function feedback(req, res) {
   const payload = {
     room_id: req.body.room_id,
     is_answer_ok: req.body.is_answer_ok,
@@ -51,7 +51,7 @@ app.post("/feedback", microbenchmark("feedback", async (req, res) => {
   }
 }));
 
-app.get("/to-cs", microbenchmark("cs redirect", async (req, res) => {
+app.get("/to-cs", microbenchmark(async function cs_redirect(req, res) {
   const room_id = req.query.room_id;
 
   try {
@@ -62,7 +62,7 @@ app.get("/to-cs", microbenchmark("cs redirect", async (req, res) => {
   }
 }));
 
-app.post("/message", microbenchmark("send message", async (req, res) => {
+app.post("/message", microbenchmark(async function send_message(req, res) {
   const payload = {
     messages: req.body.query,
   };
