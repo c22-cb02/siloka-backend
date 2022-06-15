@@ -89,7 +89,7 @@ app.post(
 
       const predictionData = response.data;
 
-      if (predictionData.accuracy < ACCURACY_THRESHOLD) {
+      if (parseFloat(predictionData.accuracy) < ACCURACY_THRESHOLD) {
         return res.json({
           viewType: 0,
           message:
