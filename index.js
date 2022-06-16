@@ -74,7 +74,7 @@ app.get(
 app.post(
   "/message",
   microbenchmark(async function send_message(req, res) {
-    const ACCURACY_THRESHOLD = 0.5;
+    const ACCURACY_THRESHOLD = 0.3;
 
     const payload = {
       messages: req.body.query,
