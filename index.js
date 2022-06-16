@@ -74,6 +74,8 @@ app.get(
 app.post(
   "/message",
   microbenchmark(async function send_message(req, res) {
+    const ACCURACY_THRESHOLD = 0.5;
+
     const payload = {
       messages: req.body.query,
     };
@@ -86,9 +88,18 @@ app.post(
       await addMessage(room_id, messageFromUser);
 
       const predictionData = response.data;
+
+      if (parseFloat(predictionData.accuracy) < ACCURACY_THRESHOLD) {
+        return res.json({
+          viewType: 0,
+          message:
+            "We don't understand what you mean. Could you repeat your question, please?",
+        });
+      }
+
       res.json({ viewType: 0, message: predictionData.predicted_response });
     } catch (err) {
-      res.json({ err: error.message });
+      res.json({ err: err.message });
     }
   })
 );
